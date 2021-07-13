@@ -4,10 +4,51 @@
 My tools for data analysis
 """
 
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Callable, Any
 
 import numpy as np
 import pandas as pd
+
+
+def pipe(raw_input: Any, *functions: Callable[[Any], Any],
+         **functions_with_args: Callable[[Any], Any]) -> Any:
+    """
+    Creates a pipeline (or chain) for every function. Basically,
+    this function initially accepts a data then passes it to the next
+    function, then the output passes it to the next function as input.
+
+    Args:
+        raw_input (Any): Any input, could be list, tuple, etc.
+
+    Other Parameters:
+        param1 (Callable): Any function with only one argument.
+        param2 (Callable): Any function with only one argument.
+        ...
+
+    Keyword Args:
+        key1 (Callable): Any function with one or more than one
+            arguments with arguments written as list.
+        key2 (Callable): Any function with one or more than one
+            arguments with arguments written as list.
+        ...
+
+    Returns:
+        Any: Any output as a result of the functions it goes through.
+    """
+
+    # TODO: Needs more improvement for robustness.
+    # Currently it will only work for some cases.
+    output = raw_input
+
+    if functions:
+        for function in functions:
+            output = function(output)
+
+    if functions_with_args:
+        for function, args_list in functions_with_args.items():
+            output = eval(function)(output, *args_list)
+
+    return output
 
 
 def get_freq(series: pd.Series) -> np.ndarray:
@@ -77,3 +118,4 @@ def get_dist_all(df: pd.DataFrame) -> dict:
             columns as input.
     """
     return {col: get_dist(df[col]) for col in df}
+
