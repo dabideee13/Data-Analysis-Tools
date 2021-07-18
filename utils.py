@@ -119,3 +119,25 @@ def get_dist_all(df: pd.DataFrame) -> dict:
     """
     return {col: get_dist(df[col]) for col in df}
 
+
+def get_unique_df(df: pd.DataFrame, return_counts: bool = False) -> np.ndarray:
+    """Get unique values and their distribution from the whole DataFrame.
+
+    Args:
+        df (pd.DataFrame): The whole DataFrame input.
+        return_counts (bool): An option to get the distribution of
+            the unique values or not.
+
+    Returns:
+        np.ndarray: An array that shows the unique values from the
+            DataFrame and their distribution if opted.
+    """
+    return np.array(
+        [
+            np.unique(
+                df.loc[:, col],
+                return_counts=return_counts
+            )
+            for col in df
+        ]
+    )
