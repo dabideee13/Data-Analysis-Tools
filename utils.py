@@ -8,6 +8,7 @@ from typing import Dict, Tuple, Callable, Any
 
 import numpy as np
 import pandas as pd
+import plotly.graph_objects as go
 
 
 def pipe(raw_input: Any, *functions: Callable[[Any], Any],
@@ -141,3 +142,17 @@ def get_unique_df(df: pd.DataFrame, return_counts: bool = False) -> np.ndarray:
             for col in df
         ]
     )
+
+
+def plot_crosstab(cross: pd.DataFrame):
+    data = [
+        go.Bar(
+            name=str(x),
+            x=cross.index,
+            y=cross[x]
+        ) for x in cross.columns
+    ]
+
+    fig = go.Figure(data)
+    fig.update_layout(barmode='stack')
+    return fig
