@@ -4,7 +4,8 @@
 My tools for data analysis
 """
 
-from typing import Dict, Tuple, Callable, Any
+from typing import Dict, Tuple, Callable, Any, List
+import re
 
 import numpy as np
 import pandas as pd
@@ -156,3 +157,19 @@ def plot_crosstab(cross: pd.DataFrame):
     fig = go.Figure(data)
     fig.update_layout(barmode='stack')
     return fig
+
+
+def word_tokenize(text: str) -> List[str]:
+    """Converts a text (in string format) to a list of string.
+
+    Args:
+        text (str): Raw text format, usually having a '.txt' file extension.
+
+    Returns:
+        List[str]: List of strings from the raw text.
+    """
+
+    first_pattern = r'[A-Za-z]{2,}'
+    second_pattern = r'W+^[\s+]'
+    new_text = re.sub(second_pattern, '', text)
+    return re.findall(first_pattern, new_text)

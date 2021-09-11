@@ -1,0 +1,8 @@
+plotly==4.7.1
+pandas==1.0.3
+pandas-datareader==0.8.1
+pandas-profiling==2.11.0
+msgpack-numpy==0.4.4.3
+numpy==1.19.5
+numpy-stl==2.11.2
+numpydoc==0.9.1
