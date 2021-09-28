@@ -5,12 +5,90 @@ My tools for data analysis
 """
 
 from pathlib import Path
-from typing import Annotated, Dict, Tuple, Callable, Any, List
+from typing import Annotated, Dict, Tuple, Callable, Any, List, Union
 import re
 
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
+
+
+class Utils:
+
+    filename: str
+    folder: str
+    sheet_name: Union[str, int]
+
+    def __init__(self, filename, folder, sheet_name = 0) -> None:
+        self.df = self.get_data(filename, folder, sheet_name)
+
+    def get_path(self, filename: str, folder: str = '') -> Path:
+        data_path = Path.joinpath(Path.cwd().parent, 'data', folder)
+        return Path.joinpath(data_path, filename)
+
+    def get_data(self, filename: str, folder: str = '', sheet_name: Union[str, int] = 0, index_col: int = 0) -> pd.DataFrame:
+        whole_path = self.get_path(filename, folder)
+        try:
+            return pd.read_csv(whole_path, index_col=index_col)
+        except UnicodeDecodeError:
+            return pd.read_excel(whole_path, sheet_name=sheet_name, index_col=index_col)
+
+    def get_indices(self, start: str, end: Optional[str] = None) -> Union[list[str], str]:
+
+        start = self.df.index.get_loc(start)
+
+        if end: end = self.df.index.get_loc(end)
+            return self.df.index[start:end + 1].tolist()
+
+        return self.df.index[start]
+
+    def _get_indices(self, indices: Union[str, Tuple[str, str]]) -> Union[str, List[str]]:
+        """Helper function for the get_indices method."""
+
+        try:
+            indices = self.get_indices(indices)
+
+        except KeyError:
+            start, *_, end = indices
+            indices = utils.get_indices(start, end)
+
+        return indices
+
+    def get_average(self, data: Union[pd.Series, pd.DataFrame, int, float]) -> float:
+        """
+        Robust average function of getting the average. Can handle different types
+        of input.
+
+        Args:
+            data (Union[pd.Series, pd.DataFrame, int, float]): The data to be averaged.
+
+        Returns:
+            float: A single average (mean) value.
+        """
+
+        try:
+            return data.apply(np.mean, axis=1).mean()
+        except Exception:
+            if isinstance(data, int) or isinstance(data, float):
+                return data
+            return data.mean()
+
+    def collapse(self, indices_from: Union[str, Tuple[str, str]], indices_to: Union[str, Tuple[str, str]]) -> float:
+        """
+        Collapse multiple columns of a dataframe into a single value by getting the mean.
+
+        Args:
+            indices_from (Union[str, Tuple[str, str]]): Column name or index name of a dataframe.
+            indices_to (Union[str, Tuple[str, str]]): Column name or index name of a dataframe.
+
+        Returns:
+            float: Mean of all the values.
+        """
+
+        indices_from = self._get_indices_helper(indices_from)
+        indices_to = self._get_indices_helper(indices_to)
+
+        return self.get_average(self.df[indices_from].loc[indices_to])
 
 
 def pipe(
@@ -179,13 +257,13 @@ def word_tokenize(text: str) -> List[str]:
     return re.findall(first_pattern, new_text)
 
 
-def get_dataPath(filename: str, directory: str = "raw") -> Path:
+def get_data_path(filename: str, directory: str = "raw") -> Path:
     data_dir = Path.joinpath(Path.cwd().parent, "data/")
     return Path.joinpath(data_dir, directory, filename)
 
 
 def get_data(filename: str, directory: str = "raw") -> str:
-    file = get_dataPath(filename, directory)
+    file = get_data_path(filename, directory)
     with open(file, encoding="utf-8") as f:
         data = f.read()
     return data
