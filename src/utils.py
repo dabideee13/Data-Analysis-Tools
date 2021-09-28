@@ -280,3 +280,61 @@ class AnnotationFactory:
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.type_hint})"
+
+
+def list_dir(path: Optional[Union[str, Path]] = None) -> List[str]:
+    """List files and directories within the current directory.
+
+    Args:
+        path (Optional[Union[str, Path]]): Target path.
+
+    Returns:
+        List[str]: List of all files in the current directory.
+    """
+
+
+    if path is None:
+        path = Path.cwd()
+
+    return [file.name for file in Path(path).glob('**/*')]
+
+
+def go_back(current_path: Path) -> Path:
+    return current_path.parent
+
+
+def go_source() -> Path:
+    """
+    Get path for top-level directory of project. Only
+    works when git was initialized within the project.
+
+    Args:
+        None
+
+    Returns:
+        Path: Absolute path of top-level directory within
+            the project.
+    """
+
+    path = Path.cwd()
+    while True:
+        if ".git" in list_dir(path):
+            return path
+        path = go_back(path)
+    return path
+
+
+def get_path(path: Optional[Path] = None, *args) -> Path:
+
+    if path is None:
+        path = go_source()
+
+    for arg in args:
+        path = Path.joinpath(Path(path), arg)
+
+    return path
+
+
+def get_path_data(directory: str = '', *args) -> Path:
+    path_data = Path.joinpath(go_source(), 'data', directory)
+    return get_path(path_data, *args)
