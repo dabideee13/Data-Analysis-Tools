@@ -19,30 +19,41 @@ class Utils:
     folder: str
     sheet_name: Union[str, int]
 
-    def __init__(self, filename, folder, sheet_name = 0) -> None:
+    def __init__(self, filename, folder, sheet_name=0) -> None:
         self.df = self.get_data(filename, folder, sheet_name)
 
-    def get_path(self, filename: str, folder: str = '') -> Path:
-        data_path = Path.joinpath(Path.cwd().parent, 'data', folder)
+    def get_path(self, filename: str, folder: str = "") -> Path:
+        data_path = Path.joinpath(Path.cwd().parent, "data", folder)
         return Path.joinpath(data_path, filename)
 
-    def get_data(self, filename: str, folder: str = '', sheet_name: Union[str, int] = 0, index_col: int = 0) -> pd.DataFrame:
+    def get_data(
+        self,
+        filename: str,
+        folder: str = "",
+        sheet_name: Union[str, int] = 0,
+        index_col: int = 0,
+    ) -> pd.DataFrame:
         whole_path = self.get_path(filename, folder)
         try:
             return pd.read_csv(whole_path, index_col=index_col)
         except UnicodeDecodeError:
             return pd.read_excel(whole_path, sheet_name=sheet_name, index_col=index_col)
 
-    def get_indices(self, start: str, end: Optional[str] = None) -> Union[list[str], str]:
+    def get_indices(
+        self, start: str, end: Optional[str] = None
+    ) -> Union[list[str], str]:
 
         start = self.df.index.get_loc(start)
 
-        if end: end = self.df.index.get_loc(end)
-            return self.df.index[start:end + 1].tolist()
+        if end:
+            end = self.df.index.get_loc(end)
+            return self.df.index[start : end + 1].tolist()
 
         return self.df.index[start]
 
-    def _get_indices(self, indices: Union[str, Tuple[str, str]]) -> Union[str, List[str]]:
+    def _get_indices(
+        self, indices: Union[str, Tuple[str, str]]
+    ) -> Union[str, List[str]]:
         """Helper function for the get_indices method."""
 
         try:
@@ -73,7 +84,11 @@ class Utils:
                 return data
             return data.mean()
 
-    def collapse(self, indices_from: Union[str, Tuple[str, str]], indices_to: Union[str, Tuple[str, str]]) -> float:
+    def collapse(
+        self,
+        indices_from: Union[str, Tuple[str, str]],
+        indices_to: Union[str, Tuple[str, str]],
+    ) -> float:
         """
         Collapse multiple columns of a dataframe into a single value by getting the mean.
 
@@ -91,11 +106,7 @@ class Utils:
         return self.get_average(self.df[indices_from].loc[indices_to])
 
 
-def pipe(
-    raw_input: Any,
-    *functions,
-    **functions_with_args
-) -> Any:
+def pipe(raw_input: Any, *functions, **functions_with_args) -> Any:
     """
     Creates a pipeline (or chain) for every function. Basically,
     this function initially accepts a data then passes it to the next
@@ -182,12 +193,7 @@ def get_dist(series: pd.Series) -> Dict[int, Tuple[int, float]]:
         the data and the values of the dictionary is a tuple
         consisting of both frequency and percentage, respecdtively.
     """
-    return dict(
-        zip(
-            series.value_counts().keys().values,
-            get_freq_perc(series)
-        )
-    )
+    return dict(zip(series.value_counts().keys().values, get_freq_perc(series)))
 
 
 def get_dist_all(df: pd.DataFrame) -> dict:
@@ -217,27 +223,15 @@ def get_unique_df(df: pd.DataFrame, return_counts: bool = False) -> np.ndarray:
             DataFrame and their distribution if opted.
     """
     return np.array(
-        [
-            np.unique(
-                df.loc[:, col],
-                return_counts=return_counts
-            )
-            for col in df
-        ]
+        [np.unique(df.loc[:, col], return_counts=return_counts) for col in df]
     )
 
 
 def plot_crosstab(cross: pd.DataFrame):
-    data = [
-        go.Bar(
-            name=str(x),
-            x=cross.index,
-            y=cross[x]
-        ) for x in cross.columns
-    ]
+    data = [go.Bar(name=str(x), x=cross.index, y=cross[x]) for x in cross.columns]
 
     fig = go.Figure(data)
-    fig.update_layout(barmode='stack')
+    fig.update_layout(barmode="stack")
     return fig
 
 
@@ -251,9 +245,9 @@ def word_tokenize(text: str) -> List[str]:
         List[str]: List of strings from the raw text.
     """
 
-    first_pattern = r'[A-Za-z]{2,}'
-    second_pattern = r'W+^[\s+]'
-    new_text = re.sub(second_pattern, '', text)
+    first_pattern = r"[A-Za-z]{2,}"
+    second_pattern = r"W+^[\s+]"
+    new_text = re.sub(second_pattern, "", text)
     return re.findall(first_pattern, new_text)
 
 
