@@ -7,6 +7,7 @@ My tools for data analysis
 from pathlib import Path
 from typing import Annotated, Dict, Tuple, Callable, Any, List, Union
 import re
+import inspect
 
 import numpy as np
 import pandas as pd
