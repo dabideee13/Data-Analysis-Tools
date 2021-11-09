@@ -338,3 +338,8 @@ def get_path(path: Optional[Path] = None, *args) -> Path:
 def get_path_data(directory: str = '', *args) -> Path:
     path_data = Path.joinpath(go_source(), 'data', directory)
     return get_path(path_data, *args)
+
+
+def get_varname(self, variable: Any) -> str:
+        local_variables = inspect.currentframe().f_back.f_locals.items()
+        return [name for name, value in local_variables if value is variable][0]
