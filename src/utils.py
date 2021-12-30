@@ -8,8 +8,6 @@ from pathlib import Path
 from typing import Annotated, Dict, Tuple, Callable, Any, List, Union
 import re
 import inspect
-from itertools import groupby
-from operator import itemgetter
 
 import numpy as np
 import pandas as pd
@@ -238,9 +236,9 @@ def get_varname(self, variable: Any) -> str:
         local_variables = inspect.currentframe().f_back.f_locals.items()
         return [name for name, value in local_variables if value is variable][0]
 
-
+    
 def extract_by_pos(data: Iterable, position: int = 0) -> Iterable:
-    return [i for i, _ in groupby(data, itemgetter(position))]
+    return [i[position] for i in data]
 
     
 def plot_bar(
