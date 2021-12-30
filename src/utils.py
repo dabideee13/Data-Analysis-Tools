@@ -250,7 +250,7 @@ def plot_bar(
     save: bool = False,
     filename: Optional[str] = None,
     customize_color: bool = False, 
-    *colors: Any
+    **colors: Any
 ) -> None:
     
     fig, ax = plt.subplots(1, figsize=figsize)
@@ -272,9 +272,9 @@ def plot_bar(
     bars = plt.barh(cat, freq, alpha=0.8, height=0.45)
     
     if customize_color:
-        assert(len(bars) == len(colors))
+        assert(len(bars) == len(colors.values()))
         
-        for bar, color in zip(bars, colors):
+        for bar, color in zip(bars, colors.values()):
             bar.set_color(color)
     
     for i, val in enumerate(zip(freq, perc)):
