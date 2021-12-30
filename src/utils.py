@@ -278,7 +278,7 @@ def plot_bar(
             bar.set_color(color)
     
     for i, val in enumerate(zip(freq, perc)):
-        plt.text(val[0] + 0.5, i, val[1], fontsize=12, va='center')
+        plt.text(val[0] + 0.5, i, str(round(val[1], 2)) + '%', fontsize=12, va='center')
     
     plt.title(title)
     
