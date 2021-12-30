@@ -8,6 +8,8 @@ from pathlib import Path
 from typing import Annotated, Dict, Tuple, Callable, Any, List, Union
 import re
 import inspect
+from itertools import groupby
+from operator import itemgetter
 
 import numpy as np
 import pandas as pd
@@ -235,3 +237,47 @@ def get_path_data(directory: str = '', *args) -> Path:
 def get_varname(self, variable: Any) -> str:
         local_variables = inspect.currentframe().f_back.f_locals.items()
         return [name for name, value in local_variables if value is variable][0]
+
+
+def extract_by_pos(data: Iterable, position: int = 0) -> Iterable:
+    return [i for i, _ in groupby(data, itemgetter(position))]
+
+    
+def plot_bar(
+    data: pd.Series, 
+    figsize: Optional[tuple[float, float]] = None, 
+    title: Optional[str] = None,
+    customize_color: bool = False, 
+    *colors: Any
+) -> None:
+    
+    fig, ax = plt.subplots(1, figsize=figsize)
+    
+    dist = get_freq_perc(data)
+    _dist = extract_by_pos(dist.items(), 1)
+    
+    cat = extract_by_pos(dist.items(), 0)
+    freq = extract_by_pos(_dist, 0)
+    perc = extract_by_pos(_dist, 1)
+    
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    
+    plt.xticks([])
+    plt.yticks(fontsize=12, va='center')
+    
+    bars = plt.barh(cat, freq, alpha=0.8, height=0.45)
+    
+    if customize_color:
+        assert(len(bars) == len(colors))
+        
+        for bar, color in zip(bars, colors):
+            bar.set_color(color)
+    
+    for i, val in enumerate(zip(freq, perc)):
+        plt.text(val[0] + 0.5, i, val[1], fontsize=12, va='center')
+    
+    plt.title(title)
+        
+    plt.show()
