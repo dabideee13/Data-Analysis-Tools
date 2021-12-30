@@ -247,6 +247,8 @@ def plot_bar(
     data: pd.Series, 
     figsize: Optional[tuple[float, float]] = None, 
     title: Optional[str] = None,
+    save: bool = False,
+    filename: Optional[str] = None,
     customize_color: bool = False, 
     *colors: Any
 ) -> None:
@@ -279,5 +281,11 @@ def plot_bar(
         plt.text(val[0] + 0.5, i, val[1], fontsize=12, va='center')
     
     plt.title(title)
+    
+    if save:
+        if filename:
+            plt.savefig(filename, transparent=True)
+        else:
+            plt.savefig("plot.png", transparent=True)
         
     plt.show()
